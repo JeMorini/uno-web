@@ -49,6 +49,7 @@ const Table: React.FC = () => {
   const [cardsPlayerOne, setCardsPlayerOne] = useState<any>([]);
   const [cardsPlayerTwo, setCardsPlayerTwo] = useState<any>([]);
   const [currentCard, setCurrentCard] = useState<any>([]);
+  const [lastAsk, setLastAsk] = useState<any>("");
 
   initializeApp({
     apiKey: "AIzaSyCYA0pyPJNH7Knc4-1-pSXqzxhrAW_btLE",
@@ -108,7 +109,7 @@ const Table: React.FC = () => {
         currentCard: currentCard,
       });
     })();
-  }, [cardsPlayerTwo, currentCard]);
+  }, [currentCard]);
 
   useEffect(() => {
     const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
@@ -117,7 +118,7 @@ const Table: React.FC = () => {
   }, []);
 
   async function askCard(prop: string) {
-    if (prop === "one") {
+    if (prop === "one" && lastAsk !== "one") {
       const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
       cardsPlayerOne.push({
         number: cards[Number(randomNumber)].number,
@@ -129,7 +130,7 @@ const Table: React.FC = () => {
         });
       })();
     }
-    if (prop === "two") {
+    if (prop === "two" && lastAsk !== "two") {
       const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
       cardsPlayerTwo.push({
         number: cards[Number(randomNumber)].number,
@@ -141,6 +142,7 @@ const Table: React.FC = () => {
         });
       })();
     }
+    setLastAsk(prop);
   }
 
   async function playCard(props: any) {
@@ -152,7 +154,7 @@ const Table: React.FC = () => {
       {cardsPlayerTwo && (
         <>
           <PlayerCards playerCards={cardsPlayerTwo} />
-          <AskCardButton onClick={() => askCard("two")}>
+          <AskCardButton style={{ left: "80%" }} onClick={() => askCard("two")}>
             <h1>Pedir carta</h1>
           </AskCardButton>
           <Card
