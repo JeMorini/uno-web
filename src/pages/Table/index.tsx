@@ -1,55 +1,61 @@
 import { useState, useEffect } from "react";
-import { ContainerTable, AskCardButton } from "./styles";
+import { ContainerTable } from "./styles";
 import Card from "../../components/Card";
 import PlayerCards from "../../components/PlayerCards";
 import { getFirestore } from "firebase/firestore";
-import { doc, setDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 
 const Table: React.FC = () => {
   const cards = [
-    { number: 1, color: "red" },
-    { number: 2, color: "red" },
-    { number: 3, color: "red" },
-    { number: 4, color: "red" },
-    { number: 5, color: "red" },
-    { number: 6, color: "red" },
-    { number: 7, color: "red" },
-    { number: 8, color: "red" },
-    { number: 9, color: "red" },
-    { number: 1, color: "blue" },
-    { number: 2, color: "blue" },
-    { number: 3, color: "blue" },
-    { number: 4, color: "blue" },
-    { number: 5, color: "blue" },
-    { number: 6, color: "blue" },
-    { number: 7, color: "blue" },
-    { number: 8, color: "blue" },
-    { number: 9, color: "blue" },
-    { number: 1, color: "green" },
-    { number: 2, color: "green" },
-    { number: 3, color: "green" },
-    { number: 4, color: "green" },
-    { number: 5, color: "green" },
-    { number: 6, color: "green" },
-    { number: 7, color: "green" },
-    { number: 8, color: "green" },
-    { number: 9, color: "green" },
-    { number: 1, color: "yellow" },
-    { number: 2, color: "yellow" },
-    { number: 3, color: "yellow" },
-    { number: 4, color: "yellow" },
-    { number: 5, color: "yellow" },
-    { number: 6, color: "yellow" },
-    { number: 7, color: "yellow" },
-    { number: 8, color: "yellow" },
-    { number: 9, color: "yellow" },
+    { number: 1, color: "#DB3C28" },
+    { number: 2, color: "#DB3C28" },
+    { number: 3, color: "#DB3C28" },
+    { number: 4, color: "#DB3C28" },
+    { number: 5, color: "#DB3C28" },
+    { number: 6, color: "#DB3C28" },
+    { number: 7, color: "#DB3C28" },
+    { number: 8, color: "#DB3C28" },
+    { number: 9, color: "#DB3C28" },
+    { number: 1, color: "#1275BA" },
+    { number: 2, color: "#1275BA" },
+    { number: 3, color: "#1275BA" },
+    { number: 4, color: "#1275BA" },
+    { number: 5, color: "#1275BA" },
+    { number: 6, color: "#1275BA" },
+    { number: 7, color: "#1275BA" },
+    { number: 8, color: "#1275BA" },
+    { number: 9, color: "#1275BA" },
+    { number: 1, color: "#8BBD44" },
+    { number: 2, color: "#8BBD44" },
+    { number: 3, color: "#8BBD44" },
+    { number: 4, color: "#8BBD44" },
+    { number: 5, color: "#8BBD44" },
+    { number: 6, color: "#8BBD44" },
+    { number: 7, color: "#8BBD44" },
+    { number: 8, color: "#8BBD44" },
+    { number: 9, color: "#8BBD44" },
+    { number: 1, color: "#F5D93D" },
+    { number: 2, color: "#F5D93D" },
+    { number: 3, color: "#F5D93D" },
+    { number: 4, color: "#F5D93D" },
+    { number: 5, color: "#F5D93D" },
+    { number: 6, color: "#F5D93D" },
+    { number: 7, color: "#F5D93D" },
+    { number: 8, color: "#F5D93D" },
+    { number: 9, color: "#F5D93D" },
   ];
   const [cardSelected, setCardSelected] = useState<any>(0);
   const [cardsPlayerOne, setCardsPlayerOne] = useState<any>([]);
   const [cardsPlayerTwo, setCardsPlayerTwo] = useState<any>([]);
   const [currentCard, setCurrentCard] = useState<any>([]);
-  const [lastAsk, setLastAsk] = useState<any>("");
+  const [currentPlayer, setCurrentPlayer] = useState<any>(
+    (Math.random() * (2 - 1) + 1).toFixed(0)
+  );
+  const [lastAsk, setLastAsk] = useState<any>("0");
+  const [playerOneSkin, setPlayerOneSkin] = useState<any>("default");
+  const [playerTwoSkin, setPlayerTwoSkin] = useState<any>("minimalist");
+  const [gameFinished, setGameFinished] = useState<any>(false);
 
   initializeApp({
     apiKey: "AIzaSyCYA0pyPJNH7Knc4-1-pSXqzxhrAW_btLE",
@@ -68,82 +74,65 @@ const Table: React.FC = () => {
       onSnapshot(doc(db, "uno", "cards"), (doc) => {
         setCardsPlayerOne(doc.data().playerOne);
         setCardsPlayerTwo(doc.data().playerTwo);
+        setPlayerOneSkin(doc.data().playerOneSkin);
+        setPlayerTwoSkin(doc.data().playerTwoSkin);
         setCurrentCard(doc.data().currentCard);
+        setLastAsk(doc.data().lastAsk);
+        setCurrentPlayer(doc.data().currentPlayer);
       });
     } catch (err) {
       alert(err);
     }
-  }, []);
+  }, [db]);
 
   useEffect(() => {
-    let newCards;
+    (cardsPlayerOne.length === 0 || cardsPlayerTwo.length === 0) &&
+      setGameFinished((prevState: any) => !prevState);
+  }, [cardsPlayerOne, cardsPlayerTwo]);
+
+  useEffect(() => {
     let initialCards = [];
     for (var i = 0; i < 7; i++) {
       const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
-      newCards = initialCards.push({
+      initialCards.push({
         number: cards[Number(randomNumber)].number,
         color: cards[Number(randomNumber)].color,
       });
       setCardsPlayerOne(initialCards);
     }
-  }, [cardSelected]);
+  }, [cardSelected, gameFinished, cards]);
 
   useEffect(() => {
-    let newCards;
     let initialCards = [];
     for (var i = 0; i < 7; i++) {
       const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
-      newCards = initialCards.push({
+      initialCards.push({
         number: cards[Number(randomNumber)].number,
         color: cards[Number(randomNumber)].color,
       });
       setCardsPlayerTwo(initialCards);
     }
-  }, [cardSelected]);
+  }, [cardSelected, gameFinished, cards]);
 
   useEffect(() => {
     (async () => {
       await setDoc(doc(db, "uno", "cards"), {
         playerOne: cardsPlayerOne,
         playerTwo: cardsPlayerTwo,
+        playerOneSkin: playerOneSkin,
+        playerTwoSkin: playerTwoSkin,
         currentCard: currentCard,
+        lastAsk: lastAsk,
+        currentPlayer: currentPlayer,
       });
     })();
-  }, [currentCard]);
+  }, [currentCard, gameFinished, currentPlayer]);
 
   useEffect(() => {
     const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
     setCardSelected(Math.random() * (35 - 0) + 0);
     setCurrentCard(cards[Number(randomNumber)]);
-  }, []);
-
-  async function askCard(prop: string) {
-    if (prop === "one" && lastAsk !== "one") {
-      const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
-      cardsPlayerOne.push({
-        number: cards[Number(randomNumber)].number,
-        color: cards[Number(randomNumber)].color,
-      });
-      (async () => {
-        await updateDoc(doc(db, "uno", "cards"), {
-          playerOne: cardsPlayerOne,
-        });
-      })();
-    }
-    if (prop === "two" && lastAsk !== "two") {
-      const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
-      cardsPlayerTwo.push({
-        number: cards[Number(randomNumber)].number,
-        color: cards[Number(randomNumber)].color,
-      });
-      (async () => {
-        await updateDoc(doc(db, "uno", "cards"), {
-          playerTwo: cardsPlayerTwo,
-        });
-      })();
-    }
-    setLastAsk(prop);
-  }
+  }, [gameFinished]);
 
   async function playCard(props: any) {
     alert(props);
@@ -153,19 +142,24 @@ const Table: React.FC = () => {
     <ContainerTable>
       {cardsPlayerTwo && (
         <>
-          <PlayerCards playerCards={cardsPlayerTwo} />
-          <AskCardButton style={{ left: "80%" }} onClick={() => askCard("two")}>
-            <h1>Pedir carta</h1>
-          </AskCardButton>
+          <PlayerCards
+            playerCards={cardsPlayerTwo}
+            skin={playerTwoSkin}
+            lastAsk={currentPlayer}
+            player={2}
+          />
           <Card
             color={currentCard.color}
             number={currentCard.number}
             playCard={() => playCard}
+            skin="default"
           />
-          <AskCardButton onClick={() => askCard("one")}>
-            <h1>Pedir carta</h1>
-          </AskCardButton>
-          <PlayerCards playerCards={cardsPlayerOne} />
+          <PlayerCards
+            playerCards={cardsPlayerOne}
+            skin={playerOneSkin}
+            lastAsk={currentPlayer}
+            player={1}
+          />
         </>
       )}
     </ContainerTable>
