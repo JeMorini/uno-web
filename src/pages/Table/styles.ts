@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const ContainerTable = styled.div`
   flex: 1;
-  background-color: gray;
+  background-image: radial-gradient(#f1aa41, #b71608, #a30a08);
   height: 100vh;
   display: flex;
   align-items: center;

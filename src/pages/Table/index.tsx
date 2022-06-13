@@ -56,20 +56,17 @@ const Table: React.FC = () => {
   const [playerOneSkin, setPlayerOneSkin] = useState<any>("default");
   const [playerTwoSkin, setPlayerTwoSkin] = useState<any>("minimalist");
   const [gameFinished, setGameFinished] = useState<any>(false);
+  const [loading, setLoading] = useState<any>();
+  const [newCards, setNewCards] = useState<any>(false);
 
   initializeApp({
-    apiKey: "AIzaSyCYA0pyPJNH7Knc4-1-pSXqzxhrAW_btLE",
-    authDomain: "unodb-dad4e.firebaseapp.com",
-    projectId: "unodb-dad4e",
-    storageBucket: "unodb-dad4e.appspot.com",
-    messagingSenderId: "260132756646",
-    appId: "1:260132756646:web:95007b3801f57f687ce867",
-    measurementId: "G-78JQGGFBS3",
+   //FIREBASE-CONFIGS
   });
 
   const db = getFirestore();
 
   useEffect(() => {
+    setLoading(true);
     try {
       onSnapshot(doc(db, "uno", "cards"), (doc) => {
         setCardsPlayerOne(doc.data().playerOne);
@@ -80,6 +77,8 @@ const Table: React.FC = () => {
         setLastAsk(doc.data().lastAsk);
         setCurrentPlayer(doc.data().currentPlayer);
       });
+
+      setLoading(false);
     } catch (err) {
       alert(err);
     }
@@ -99,8 +98,9 @@ const Table: React.FC = () => {
         color: cards[Number(randomNumber)].color,
       });
       setCardsPlayerOne(initialCards);
+      setNewCards((prevState: any) => !prevState);
     }
-  }, [cardSelected, gameFinished, cards]);
+  }, [gameFinished]);
 
   useEffect(() => {
     let initialCards = [];
@@ -111,8 +111,9 @@ const Table: React.FC = () => {
         color: cards[Number(randomNumber)].color,
       });
       setCardsPlayerTwo(initialCards);
+      setNewCards((prevState: any) => !prevState);
     }
-  }, [cardSelected, gameFinished, cards]);
+  }, [gameFinished]);
 
   useEffect(() => {
     (async () => {
@@ -126,7 +127,7 @@ const Table: React.FC = () => {
         currentPlayer: currentPlayer,
       });
     })();
-  }, [currentCard, gameFinished, currentPlayer]);
+  }, [loading, gameFinished, cardsPlayerTwo]);
 
   useEffect(() => {
     const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
