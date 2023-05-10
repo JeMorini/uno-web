@@ -59,9 +59,7 @@ const Table: React.FC = () => {
   const [loading, setLoading] = useState<any>();
   const [newCards, setNewCards] = useState<any>(false);
 
-  initializeApp({
-   //FIREBASE-CONFIGS
-  });
+  initializeApp();
 
   const db = getFirestore();
 

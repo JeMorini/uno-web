@@ -123,3 +123,7 @@ margin-right: 4px;
 transform: rotate(-180deg);
       `}
 `;
+
+export const ImageCard = styled.img`
+  transform: rotate(-30deg);
+`;
